@@ -11,7 +11,7 @@ export default function AboutPage() {
         <div className="container mx-auto px-4 py-6">
           <div className="text-center">
             <h1 className="text-4xl md:text-5xl font-serif font-bold mb-2">
-              Z.C.U Posters
+              ZEFF Posters
             </h1>
             <p className="text-muted-foreground text-lg">
               Premium Posters for Your Space

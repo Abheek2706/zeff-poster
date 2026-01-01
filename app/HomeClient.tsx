@@ -129,7 +129,7 @@ export default function HomeClient({ posters }: { posters: any[] }) {
       {/* HEADER */}
       <header className="border-b bg-card">
         <div className="container mx-auto px-4 py-5 text-center">
-          <h1 className="text-4xl font-serif font-bold">Z.C.U Posters</h1>
+          <h1 className="text-4xl font-serif font-bold">ZEFF Posters</h1>
           <p className="text-muted-foreground">
             Premium Posters for Your Space
           </p>
