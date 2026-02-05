@@ -5,6 +5,7 @@ import { Analytics } from "@vercel/analytics/next"
 import Providers from "./providers"
 import "./globals.css"
 import Banner from "@/components/Banner"
+import { Toaster } from "sonner"
 
 const playfair = Playfair_Display({ subsets: ["latin"], variable: "--font-serif" })
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" })
@@ -34,6 +35,7 @@ export default function RootLayout({
           <Banner />
           {children}
         </Providers>
+        <Toaster />
         <Analytics />
       </body>
     </html>

@@ -3,6 +3,7 @@
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { useCart } from "./CartContext"
+import CheckoutButton from "../checkout/CheckoutButton"
 
 export default function CartDrawer({ onClose }: { onClose: () => void }) {
   const { cart, updateQty, removeFromCart, total, clearCart } = useCart()
@@ -56,9 +57,7 @@ export default function CartDrawer({ onClose }: { onClose: () => void }) {
               <span>₹{total}</span>
             </div>
 
-            <Button className="w-full mt-4" onClick={checkout}>
-              Checkout on WhatsApp
-            </Button>
+            <CheckoutButton />
           </>
         )}
 
