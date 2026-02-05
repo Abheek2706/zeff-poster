@@ -4,37 +4,37 @@ import path from "path"
 /* ---------- MANUAL PRICE MAP ---------- */
 const PRICE_MAP: Record<string, number> = {
   // Cars
-  "bmw": 149,
-  "car": 149,
-  "porche": 149,
-  "nfs": 149,
-  "formula": 149,
-  "f1": 149,
+  "bmw": 99,
+  "car": 99,
+  "porche": 99,
+  "nfs": 99,
+  "formula": 99,
+  "f1": 99,
 
   // Superheroes / Movies
-  "avengers": 149,
-  "batman": 149,
-  "spiderman": 149,
-  "daredevil": 149,
-  "deadpool": 149,
-  "supergirl": 149,
-  "superheroes": 199,
-  "bumblebee": 199,
-  "prime": 199,
+  "avengers": 99,
+  "batman": 99,
+  "spiderman": 99,
+  "daredevil": 99,
+  "deadpool": 99,
+  "supergirl": 99,
+  "superheroes": 99,
+  "bumblebee": 99,
+  "prime": 99,
 
   // Series / Quotes
-  "stranger-things": 149,
-  "i-am-choosen": 149,
-  "hope": 149,
-  "why-not-me": 149,
+  "stranger-things": 99,
+  "i-am-choosen": 99,
+  "hope": 99,
+  "why-not-me": 99,
 
   // Art / Fantasy
-  "dragon-got": 149,
-  "avatar": 199,
-  "skull": 149,
-  "starboy": 149,
-  "loki": 149,
-  "lokiking": 149,
+  "dragon-got": 99,
+  "avatar": 99,
+  "skull": 99,
+  "starboy": 99,
+  "loki": 99,
+  "lokiking": 99,
 }
 
 /* ---------- MANUAL CATEGORY MAP ---------- */
@@ -110,7 +110,7 @@ export function getAllPosters() {
       slug,
       name: cleanName(file),
       category: CATEGORY_MAP[slug] ?? "General",
-      price: PRICE_MAP[slug] ?? 149,
+      price: PRICE_MAP[slug] ?? 99,
       image: `/posters/${file}`,
       description: "Premium wall poster",
       createdAt: new Date().toISOString(),

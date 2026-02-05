@@ -13,7 +13,7 @@ export const posters: Poster[] = [
   {
     slug: "red-sports-car",
     name: "Red Sports Car",
-    price: 599,
+    price: 99,
     category: "Cars",
     image: "/posters/red-sports-car.jpg",
     description: "A sleek red sports car speeding down the highway.",
@@ -23,7 +23,7 @@ export const posters: Poster[] = [
   {
     slug: "mountain-landscape",
     name: "Mountain Landscape",
-    price: 499,
+    price: 99,
     category: "General",
     image: "/posters/mountain-landscape.jpg",
     description: "A breathtaking view of mountains during sunrise.",

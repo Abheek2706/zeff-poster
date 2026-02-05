@@ -17,7 +17,7 @@ export async function generateMetadata({ params }: PageProps) {
   if (!poster) return {}
 
   return {
-    title: `${poster.name} | Z.C.U Posters`,
+    title: `${poster.name} | ZEFF Posters`,
     description: poster.description,
     openGraph: {
       images: [poster.image],

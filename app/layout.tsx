@@ -4,12 +4,13 @@ import { Playfair_Display, Inter } from "next/font/google"
 import { Analytics } from "@vercel/analytics/next"
 import Providers from "./providers"
 import "./globals.css"
+import Banner from "@/components/Banner"
 
 const playfair = Playfair_Display({ subsets: ["latin"], variable: "--font-serif" })
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" })
 
 export const metadata: Metadata = {
-  title: "Z.C.U Posters - Premium Posters for Your Space",
+  title: "ZEFF Posters - Premium Posters for Your Space",
   description: "Premium posters for your space. Browse our collection or create custom designs.",
   icons: {
     icon: [
@@ -29,7 +30,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${inter.variable} ${playfair.variable} font-sans antialiased`}>
-        <Providers>{children}</Providers>
+        <Providers>
+          <Banner />
+          {children}
+        </Providers>
         <Analytics />
       </body>
     </html>

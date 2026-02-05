@@ -21,12 +21,12 @@ export default function HomeClient({ posters }: { posters: any[] }) {
   const [popularityMap, setPopularityMap] = useState<Record<string, number>>({})
 
   useEffect(() => {
-    const stored = localStorage.getItem("zcu-popularity")
+    const stored = localStorage.getItem("zeff-popularity")
     if (stored) setPopularityMap(JSON.parse(stored))
   }, [])
 
   useEffect(() => {
-    localStorage.setItem("zcu-popularity", JSON.stringify(popularityMap))
+    localStorage.setItem("zeff-popularity", JSON.stringify(popularityMap))
   }, [popularityMap])
 
   const handleAddToCart = (poster: any) => {

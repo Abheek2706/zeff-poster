@@ -26,13 +26,13 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
   // Load cart
   useEffect(() => {
-    const saved = localStorage.getItem("zcu-cart")
+    const saved = localStorage.getItem("zeff-cart")
     if (saved) setCart(JSON.parse(saved))
   }, [])
 
   // Save cart
   useEffect(() => {
-    localStorage.setItem("zcu-cart", JSON.stringify(cart))
+    localStorage.setItem("zeff-cart", JSON.stringify(cart))
   }, [cart])
 
   const addToCart = (item: Omit<CartItem, "quantity">) => {
