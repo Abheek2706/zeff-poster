@@ -32,25 +32,25 @@ export async function POST(req: Request) {
         // Let's implement a smart calculation:
 
         let totalAmount = 0
-
-        // For simplicity based on prompt:
-        // If exact bundles are matched, use bundle price? 
-        // Or just simple price * qty? 
-        // The prompt implies a bundle offer.
-        // "Buy 5 Posters @ 475"
-        // Let's calculate based on sets of 10, sets of 5, and remainders.
-
         let remainingQty = totalQty
 
-        const setsOf10 = Math.floor(remainingQty / 10)
-        remainingQty -= setsOf10 * 10
-        totalAmount += setsOf10 * 930
+        if (totalQty > 10) {
+            // Capped Pricing Logic
+            // First 10 @ 930
+            // Additional @ 93
+            totalAmount = 930 + (totalQty - 10) * 93
+        } else {
+            // Standard Bundle Logic
+            const setsOf10 = Math.floor(remainingQty / 10)
+            remainingQty -= setsOf10 * 10
+            totalAmount += setsOf10 * 930
 
-        const setsOf5 = Math.floor(remainingQty / 5)
-        remainingQty -= setsOf5 * 5
-        totalAmount += setsOf5 * 475
+            const setsOf5 = Math.floor(remainingQty / 5)
+            remainingQty -= setsOf5 * 5
+            totalAmount += setsOf5 * 475
 
-        totalAmount += remainingQty * 99
+            totalAmount += remainingQty * 99
+        }
 
         // Create Razorpay Order
         const options = {

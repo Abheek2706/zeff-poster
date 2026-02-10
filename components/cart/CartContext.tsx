@@ -1,6 +1,6 @@
 "use client"
 
-import { createContext, useContext, useEffect, useState } from "react"
+import { createContext, useContext, useEffect, useState, useMemo } from "react"
 
 export type CartItem = {
   id: number
@@ -61,7 +61,30 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
   const clearCart = () => setCart([])
 
-  const total = cart.reduce((sum, i) => sum + i.price * i.quantity, 0)
+  const total = useMemo(() => {
+    const totalQty = cart.reduce((sum, i) => sum + i.quantity, 0)
+    let totalAmount = 0
+    let remainingQty = totalQty
+
+    if (totalQty > 10) {
+      // If more than 10, first 10 is 930
+      // For every poster above 10, price is 93 (same profit margin as 10 posters)
+      totalAmount = 930 + (totalQty - 10) * 93
+    } else {
+      // Standard Bundle Logic for <= 10
+      const setsOf10 = Math.floor(remainingQty / 10)
+      remainingQty -= setsOf10 * 10
+      totalAmount += setsOf10 * 930
+
+      const setsOf5 = Math.floor(remainingQty / 5)
+      remainingQty -= setsOf5 * 5
+      totalAmount += setsOf5 * 475
+
+      totalAmount += remainingQty * 99
+    }
+
+    return totalAmount
+  }, [cart])
 
   return (
     <CartContext.Provider
