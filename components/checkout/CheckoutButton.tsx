@@ -57,8 +57,8 @@ export default function CheckoutButton() {
                 key: orderData.keyId,
                 amount: orderData.amount,
                 currency: orderData.currency,
-                name: "ZEFF Posters",
-                description: "Premium Poster Order",
+                name: "zeff.store",
+                description: "Premium Order",
                 order_id: orderData.orderId,
                 handler: async function (response: any) {
                     // 3. Verify Payment

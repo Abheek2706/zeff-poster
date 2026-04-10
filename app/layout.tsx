@@ -1,18 +1,16 @@
 import type React from "react"
 import type { Metadata } from "next"
-import { Playfair_Display, Inter } from "next/font/google"
+import { Inter } from "next/font/google"
 import { Analytics } from "@vercel/analytics/next"
 import Providers from "./providers"
 import "./globals.css"
-import Banner from "@/components/Banner"
 import { Toaster } from "sonner"
 
-const playfair = Playfair_Display({ subsets: ["latin"], variable: "--font-serif" })
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" })
 
 export const metadata: Metadata = {
-  title: "ZEFF Posters - Premium Posters for Your Space",
-  description: "Premium posters for your space. Browse our collection or create custom designs.",
+  title: "zeff.store - Premium Items for Your Space",
+  description: "Premium items for your space. Browse our collection of trending, new, and classic designs.",
   icons: {
     icon: [
       { url: "/icon-light-32x32.png", media: "(prefers-color-scheme: light)" },
@@ -30,9 +28,8 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={`${inter.variable} ${playfair.variable} font-sans antialiased`}>
+      <body className={`${inter.variable} font-sans antialiased`}>
         <Providers>
-          <Banner />
           {children}
         </Providers>
         <Toaster />

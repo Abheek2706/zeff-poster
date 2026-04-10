@@ -1,7 +1,7 @@
 import { getAllPosters } from "@/lib/getPosters"
-import HomeClient from "./HomeClient"
+import HomeWrapper from "./HomeWrapper"
 
-export default function Page() {
+export default function Home() {
   const posters = getAllPosters()
-  return <HomeClient posters={posters} />
+  return <HomeWrapper posters={posters} />
 }
