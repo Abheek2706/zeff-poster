@@ -5,6 +5,7 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { useAuth } from "@/components/auth/AuthContext"
+import GoogleAuthButton from "@/components/auth/GoogleAuthButton"
 import Navbar from "@/components/layout/Navbar"
 import Footer from "@/components/layout/Footer"
 
@@ -48,6 +49,7 @@ export default function RegisterPage() {
     const [errors, setErrors] = useState<Errors>({})
     const [authError, setAuthError] = useState("")
     const [submitted, setSubmitted] = useState(false)
+    const [submitting, setSubmitting] = useState(false)
     const [profilePreview, setProfilePreview] = useState<string | null>(null)
     const [idProofName, setIdProofName] = useState<string | null>(null)
     const profileRef = useRef<HTMLInputElement>(null)
@@ -110,31 +112,38 @@ export default function RegisterPage() {
         return Object.keys(e).length === 0
     }
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
         setAuthError("")
-        if (validate()) {
-            const err = authRegister({
-                fullName: form.fullName,
-                username: form.username,
-                email: form.email,
-                password: form.password,
-            })
-            if (err) {
-                setAuthError(err)
-            } else {
-                setSubmitted(true)
-                setTimeout(() => {
-                    window.location.href = "/"
-                }, 1500)
-            }
+        if (!validate()) {
+            return
         }
+
+        setSubmitting(true)
+        const err = await authRegister({
+            fullName: form.fullName,
+            username: form.username,
+            email: form.email,
+            password: form.password,
+        })
+
+        if (err) {
+            setAuthError(err)
+            setSubmitting(false)
+            return
+        }
+
+        setSubmitted(true)
+        setTimeout(() => {
+            window.location.href = "/"
+        }, 1500)
     }
 
     const handleReset = () => {
         setForm(initialForm)
         setErrors({})
         setSubmitted(false)
+        setSubmitting(false)
         setProfilePreview(null)
         setIdProofName(null)
         if (profileRef.current) profileRef.current.value = ""
@@ -168,6 +177,13 @@ export default function RegisterPage() {
                         </Card>
                     ) : (
                         <Card className="p-8">
+                            <div className="mb-6 space-y-4">
+                                <GoogleAuthButton nextPath="/">Sign up with Google</GoogleAuthButton>
+                                <div className="relative text-center text-xs uppercase tracking-[0.2em] text-muted-foreground">
+                                    <span className="bg-white px-3 relative z-10">or</span>
+                                    <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 border-t border-border" />
+                                </div>
+                            </div>
                             {authError && (
                                 <div className="text-red-500 text-sm mb-4 p-3 bg-red-50 rounded border border-red-200">
                                     {authError}
@@ -290,7 +306,9 @@ export default function RegisterPage() {
                                     <Button type="button" variant="outline" onClick={handleReset}>
                                         Reset
                                     </Button>
-                                    <Button type="submit">Create Account</Button>
+                                    <Button type="submit" disabled={submitting}>
+                                        {submitting ? "Creating Account..." : "Create Account"}
+                                    </Button>
                                 </div>
                             </form>
 

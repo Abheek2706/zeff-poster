@@ -2,83 +2,131 @@
 
 import { createContext, useContext, useEffect, useState } from "react"
 
-type User = {
-    fullName: string
-    username: string
-    email: string
+export type User = {
+  id: string
+  fullName: string
+  username: string
+  email: string
+  avatarUrl: string | null
+  provider: "credentials" | "google" | "hybrid"
 }
 
 type AuthContextType = {
-    user: User | null
-    isLoading: boolean
-    login: (username: string, password: string) => string | null
-    register: (user: User & { password: string }) => string | null
-    logout: () => void
+  user: User | null
+  isLoading: boolean
+  login: (identifier: string, password: string) => Promise<string | null>
+  register: (user: {
+    fullName: string
+    username: string
+    email: string
+    password: string
+  }) => Promise<string | null>
+  logout: () => Promise<void>
+  refreshSession: () => Promise<void>
 }
 
 const AuthContext = createContext<AuthContextType | null>(null)
 
+async function parseResponse<T>(response: Response): Promise<T> {
+  const contentType = response.headers.get("content-type") || ""
+  if (!contentType.includes("application/json")) {
+    throw new Error("Unexpected server response.")
+  }
+
+  return response.json() as Promise<T>
+}
+
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-    const [user, setUser] = useState<User | null>(null)
-    const [isLoading, setIsLoading] = useState(true)
+  const [user, setUser] = useState<User | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
 
-    useEffect(() => {
-        const saved = localStorage.getItem("zeff-user")
-        if (saved) setUser(JSON.parse(saved))
-        setIsLoading(false)
-    }, [])
-
-    const login = (username: string, password: string): string | null => {
-        const usersRaw = localStorage.getItem("zeff-users")
-        const users: Record<string, { fullName: string; email: string; password: string }> = usersRaw
-            ? JSON.parse(usersRaw)
-            : {}
-
-        const entry = users[username.toLowerCase()]
-        if (!entry) return "Account not found. Please sign up."
-        if (entry.password !== password) return "Incorrect password."
-
-        const u: User = { fullName: entry.fullName, username: username.toLowerCase(), email: entry.email }
-        setUser(u)
-        localStorage.setItem("zeff-user", JSON.stringify(u))
-        return null
+  const refreshSession = async () => {
+    try {
+      const response = await fetch("/api/auth/session", {
+        method: "GET",
+        cache: "no-store",
+      })
+      const data = await parseResponse<{ user: User | null }>(response)
+      setUser(data.user)
+    } catch {
+      setUser(null)
+    } finally {
+      setIsLoading(false)
     }
+  }
 
-    const register = (data: User & { password: string }): string | null => {
-        const usersRaw = localStorage.getItem("zeff-users")
-        const users: Record<string, { fullName: string; email: string; password: string }> = usersRaw
-            ? JSON.parse(usersRaw)
-            : {}
+  useEffect(() => {
+    void refreshSession()
+  }, [])
 
-        if (users[data.username.toLowerCase()]) return "Username already taken."
+  const login = async (identifier: string, password: string) => {
+    try {
+      const response = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ identifier, password }),
+      })
 
-        users[data.username.toLowerCase()] = {
-            fullName: data.fullName,
-            email: data.email,
-            password: data.password,
-        }
-        localStorage.setItem("zeff-users", JSON.stringify(users))
+      const data = await parseResponse<{ user?: User; error?: string }>(response)
+      if (!response.ok || !data.user) {
+        return data.error || "Unable to sign in."
+      }
 
-        const u: User = { fullName: data.fullName, username: data.username.toLowerCase(), email: data.email }
-        setUser(u)
-        localStorage.setItem("zeff-user", JSON.stringify(u))
-        return null
+      setUser(data.user)
+      return null
+    } catch {
+      return "Unable to sign in right now. Please try again."
     }
+  }
 
-    const logout = () => {
-        setUser(null)
-        localStorage.removeItem("zeff-user")
+  const register = async (data: {
+    fullName: string
+    username: string
+    email: string
+    password: string
+  }) => {
+    try {
+      const response = await fetch("/api/auth/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      })
+
+      const payload = await parseResponse<{ user?: User; error?: string }>(response)
+      if (!response.ok || !payload.user) {
+        return payload.error || "Unable to create your account."
+      }
+
+      setUser(payload.user)
+      return null
+    } catch {
+      return "Unable to create your account right now. Please try again."
     }
+  }
 
-    return (
-        <AuthContext.Provider value={{ user, isLoading, login, register, logout }}>
-            {children}
-        </AuthContext.Provider>
-    )
+  const logout = async () => {
+    try {
+      await fetch("/api/auth/logout", {
+        method: "POST",
+      })
+    } finally {
+      setUser(null)
+    }
+  }
+
+  return (
+    <AuthContext.Provider value={{ user, isLoading, login, register, logout, refreshSession }}>
+      {children}
+    </AuthContext.Provider>
+  )
 }
 
 export const useAuth = () => {
-    const ctx = useContext(AuthContext)
-    if (!ctx) throw new Error("useAuth must be inside AuthProvider")
-    return ctx
+  const ctx = useContext(AuthContext)
+  if (!ctx) throw new Error("useAuth must be inside AuthProvider")
+  return ctx
 }

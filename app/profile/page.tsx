@@ -15,16 +15,22 @@ export default function ProfilePage() {
         <h1 className="text-3xl font-bold text-zinc-900 mb-8">My Account</h1>
 
         <div className="bg-white rounded-xl border border-zinc-200 overflow-hidden">
-          {/* Avatar header */}
           <div className="bg-gradient-to-r from-zinc-900 to-zinc-700 p-8 text-white text-center">
-            <div className="w-20 h-20 rounded-full bg-white/20 mx-auto flex items-center justify-center text-3xl font-bold mb-3">
-              {user.fullName.charAt(0).toUpperCase()}
-            </div>
+            {user.avatarUrl ? (
+              <img
+                src={user.avatarUrl}
+                alt={user.fullName}
+                className="w-20 h-20 rounded-full object-cover mx-auto mb-3 border border-white/20"
+              />
+            ) : (
+              <div className="w-20 h-20 rounded-full bg-white/20 mx-auto flex items-center justify-center text-3xl font-bold mb-3">
+                {user.fullName.charAt(0).toUpperCase()}
+              </div>
+            )}
             <h2 className="text-xl font-bold">{user.fullName}</h2>
             <p className="text-zinc-300 text-sm">@{user.username}</p>
           </div>
 
-          {/* Info */}
           <div className="p-6 space-y-4">
             <div className="flex justify-between items-center py-3 border-b border-zinc-100">
               <span className="text-sm text-zinc-500">Full Name</span>
@@ -38,9 +44,12 @@ export default function ProfilePage() {
               <span className="text-sm text-zinc-500">Email</span>
               <span className="font-medium">{user.email}</span>
             </div>
+            <div className="flex justify-between items-center py-3">
+              <span className="text-sm text-zinc-500">Sign-In Method</span>
+              <span className="font-medium capitalize">{user.provider}</span>
+            </div>
           </div>
 
-          {/* Actions */}
           <div className="p-6 border-t border-zinc-100 flex flex-col sm:flex-row gap-3">
             <Link href="/wishlist" className="flex-1">
               <Button variant="outline" className="w-full">
@@ -50,8 +59,8 @@ export default function ProfilePage() {
             <Button
               variant="destructive"
               className="flex-1"
-              onClick={() => {
-                logout()
+              onClick={async () => {
+                await logout()
                 window.location.href = "/login"
               }}
             >

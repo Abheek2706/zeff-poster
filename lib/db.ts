@@ -1,58 +1,49 @@
-import fs from "fs"
-import path from "path"
+import { Pool, type PoolClient, type QueryResult, type QueryResultRow } from "pg"
 
-const DB_PATH = path.join(process.cwd(), "data/orders.json")
+const connectionString = process.env.DATABASE_URL?.trim()
 
-// Ensure DB directory exists
-if (!fs.existsSync(path.dirname(DB_PATH))) {
-    fs.mkdirSync(path.dirname(DB_PATH), { recursive: true })
+if (!connectionString) {
+  throw new Error("DATABASE_URL is not configured.")
 }
 
-// Ensure DB file exists
-if (!fs.existsSync(DB_PATH)) {
-    fs.writeFileSync(DB_PATH, JSON.stringify([]))
+declare global {
+  var __zeffDbPool: Pool | undefined
 }
 
-export type Order = {
-    id: string
-    amount: number
-    currency: string
-    status: "created" | "paid" | "failed"
-    items: any[]
-    createdAt: string
-    paymentId?: string
-    razorpayOrderId: string
+const pool =
+  global.__zeffDbPool ??
+  new Pool({
+    connectionString,
+    max: 10,
+    idleTimeoutMillis: 30_000,
+    connectionTimeoutMillis: 10_000,
+  })
+
+if (process.env.NODE_ENV !== "production") {
+  global.__zeffDbPool = pool
 }
 
-export function saveOrder(order: Order) {
-    const orders = getOrders()
-    orders.push(order)
-    fs.writeFileSync(DB_PATH, JSON.stringify(orders, null, 2))
+export async function query<T extends QueryResultRow = QueryResultRow>(
+  text: string,
+  params: readonly unknown[] = [],
+): Promise<QueryResult<T>> {
+  return pool.query<T>(text, params)
 }
 
-export function getOrders(): Order[] {
-    try {
-        const data = fs.readFileSync(DB_PATH, "utf-8")
-        return JSON.parse(data)
-    } catch (error) {
-        return []
-    }
+export async function withTransaction<T>(callback: (client: PoolClient) => Promise<T>): Promise<T> {
+  const client = await pool.connect()
+
+  try {
+    await client.query("BEGIN")
+    const result = await callback(client)
+    await client.query("COMMIT")
+    return result
+  } catch (error) {
+    await client.query("ROLLBACK")
+    throw error
+  } finally {
+    client.release()
+  }
 }
 
-export function getOrderByRazorpayId(rzpOrderId: string): Order | undefined {
-    const orders = getOrders()
-    return orders.find((o) => o.razorpayOrderId === rzpOrderId)
-}
-
-export function updateOrderStatus(rzpOrderId: string, status: Order["status"], paymentId?: string) {
-    const orders = getOrders()
-    const orderIndex = orders.findIndex((o) => o.razorpayOrderId === rzpOrderId)
-
-    if (orderIndex > -1) {
-        orders[orderIndex].status = status
-        if (paymentId) orders[orderIndex].paymentId = paymentId
-        fs.writeFileSync(DB_PATH, JSON.stringify(orders, null, 2))
-        return true
-    }
-    return false
-}
+export { pool }

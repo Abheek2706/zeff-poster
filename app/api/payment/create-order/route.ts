@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server"
 import Razorpay from "razorpay"
-import { saveOrder } from "@/lib/db"
+import { saveOrder } from "@/lib/orderDb"
 
 // Initialize Razorpay
 const razorpay = new Razorpay({
